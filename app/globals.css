@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
+/* Light Mode Defaults */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fdfdfd;          /* Softer off-white */
+  --foreground: #1a1a1a;          /* Slightly lighter than black */
+  --accent: #2563eb;              /* Optional accent (blue-600) */
 }
 
+/* Tailwind theme override */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -12,15 +15,18 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Dark Mode (less harsh than pure black) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #121212;        /* Charcoal gray */
+    --foreground: #f1f5f9;        /* Light but not pure white */
+    --accent: #3b82f6;            /* Lighter blue for contrast */
   }
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
 }
