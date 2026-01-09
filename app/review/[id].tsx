@@ -35,7 +35,7 @@ export default function ReviewDetail() {
     );
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <View className="flex-1 bg-white">
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero Image Section */}
         <View className="relative shadow-lg">
@@ -53,7 +53,7 @@ export default function ReviewDetail() {
               onPress={() => router.back()}
               className="bg-black/30 backdrop-blur-md p-3 rounded-full border border-white/40 active:bg-black/50"
             >
-              <Ionicons name="chevron-back" size={24} color="white" />
+              <Ionicons name="chevron-back" size={20} color="white" />
             </Pressable>
           </SafeAreaView>
         </View>
@@ -122,14 +122,14 @@ export default function ReviewDetail() {
           </Pressable>
 
           {/* Car Info at Bottom */}
-          <SafeAreaView className="bg-gradient-to-t from-black via-black/70 to-transparent px-6 py-6">
+          <View className="bg-gradient-to-t from-black via-black/70 to-transparent px-6 py-6">
             <Text className="text-white text-2xl font-black">{car.title}</Text>
             <Text className="text-blue-400 font-semibold text-sm tracking-widest uppercase mt-1">
               {car.subtitle}
             </Text>
-          </SafeAreaView>
+          </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
