@@ -62,9 +62,22 @@ export default function ReviewDetail() {
         <View className="px-6 pt-8 pb-8 bg-white rounded-t-[32px] shadow-sm">
           {/* Title Section */}
           <View className="mb-6">
-            <Text className="text-4xl font-black text-gray-900 tracking-tight mb-2">
-              {car.title}
-            </Text>
+            <View className="flex-row items-start justify-between mb-2">
+              <View className="flex-1">
+                <Text className="text-4xl font-black text-gray-900 tracking-tight">
+                  {car.title}
+                </Text>
+              </View>
+              {/* Rating Badge */}
+              {car.rating && (
+                <View className="bg-amber-100 px-3 py-1.5 rounded-xl flex-row items-center ml-2">
+                  <Ionicons name="star" size={14} color="#fbbf24" />
+                  <Text className="ml-1 font-bold text-amber-700 text-sm">
+                    {car.rating}
+                  </Text>
+                </View>
+              )}
+            </View>
             <Text className="text-blue-600 font-semibold tracking-widest uppercase text-xs">
               {car.subtitle}
             </Text>
@@ -72,6 +85,62 @@ export default function ReviewDetail() {
 
           {/* Divider */}
           <View className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-8" />
+
+          {/* Quick Specs Grid */}
+          {(car.fuelUsage || car.votes || car.author) && (
+            <View className="flex-row justify-between mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+              {car.fuelUsage && (
+                <View className="items-center flex-1">
+                  <Ionicons
+                    name="speedometer-outline"
+                    size={18}
+                    color="#6b7280"
+                  />
+                  <Text className="text-[10px] text-gray-400 uppercase mt-1">
+                    Fuel
+                  </Text>
+                  <Text className="text-sm font-bold text-gray-900">
+                    {car.fuelUsage}
+                  </Text>
+                </View>
+              )}
+              {car.fuelUsage && car.votes && (
+                <View className="w-px h-8 bg-gray-200 self-center" />
+              )}
+              {car.votes && (
+                <View className="items-center flex-1">
+                  <Ionicons name="people-outline" size={18} color="#6b7280" />
+                  <Text className="text-[10px] text-gray-400 uppercase mt-1">
+                    Votes
+                  </Text>
+                  <Text className="text-sm font-bold text-gray-900">
+                    {car.votes}
+                  </Text>
+                </View>
+              )}
+              {car.votes && car.author && (
+                <View className="w-px h-8 bg-gray-200 self-center" />
+              )}
+              {car.author && (
+                <View className="items-center flex-1">
+                  <Ionicons
+                    name="person-circle-outline"
+                    size={18}
+                    color="#6b7280"
+                  />
+                  <Text className="text-[10px] text-gray-400 uppercase mt-1">
+                    Author
+                  </Text>
+                  <Text
+                    className="text-sm font-bold text-gray-900"
+                    numberOfLines={1}
+                  >
+                    {car.author}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* Overview Section */}
           <View className="mb-8">
@@ -83,6 +152,32 @@ export default function ReviewDetail() {
               {car.description}
             </Text>
           </View>
+
+          {/* Common Issues Section */}
+          {car.issues && car.issues.length > 0 && (
+            <View className="mb-8">
+              <View className="flex-row items-center mb-3">
+                <View className="w-1 h-6 bg-red-500 rounded-full mr-3" />
+                <Text className="text-lg font-bold text-gray-900">
+                  Common Issues
+                </Text>
+              </View>
+              <View className="pl-4">
+                {car.issues.map((issue, index) => (
+                  <View key={index} className="flex-row items-center mb-2">
+                    <Ionicons
+                      name="alert-circle-outline"
+                      size={14}
+                      color="#ef4444"
+                    />
+                    <Text className="text-gray-600 ml-2 text-base">
+                      {issue}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
 
           {/* Owner Notes Card */}
           <View className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100 shadow-sm">
