@@ -7,37 +7,51 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { reviews } from "../../data/reviews";
+import { supabase, mapReviewData } from "@/utils/supabase";
 import ReviewCard from "@/components/ReviewCard";
+import { Review } from "../../data/reviews";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function SearchTab() {
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [results, setResults] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // 1. Debounce Logic
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 300);
+    async function handleSearch() {
+      if (query.trim().length === 0) {
+        setResults([]);
+        return;
+      }
 
-    return () => clearTimeout(handler);
-  }, [query]);
-
-  // 2. Filter Logic: Only run if there is a query
-  const results =
-    debouncedQuery.trim() === ""
-      ? []
-      : reviews.filter((car) => {
-          const searchTerm = debouncedQuery.toLowerCase();
-          return (
-            car.carMake.toLowerCase().includes(searchTerm) ||
-            car.carModel.toLowerCase().includes(searchTerm) ||
-            car.title.toLowerCase().includes(searchTerm)
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("*")
+          .or(
+            `car_make.ilike.%${query}%,car_model.ilike.%${query}%,title.ilike.%${query}%`
           );
-        });
+
+        if (error) throw error;
+
+        if (data) {
+          setResults(data.map(mapReviewData));
+        }
+      } catch (err) {
+        console.error("Search Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Debounce: Wait 400ms after user stops typing to call Supabase
+    const timer = setTimeout(handleSearch, 400);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
@@ -49,7 +63,6 @@ export default function SearchTab() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Header Section */}
           <View className="px-6 pt-4 pb-6">
             <Text className="text-3xl font-black text-gray-900 tracking-tight">
               Search
@@ -59,7 +72,6 @@ export default function SearchTab() {
             </Text>
           </View>
 
-          {/* Search Input Box */}
           <View className="px-6 pb-6">
             <View className="flex-row items-center bg-white px-4 py-3 rounded-2xl border border-gray-100 shadow-sm">
               <Ionicons name="search" size={20} color="#9ca3af" />
@@ -79,11 +91,14 @@ export default function SearchTab() {
             </View>
           </View>
 
-          {/* Results Section */}
           <View className="px-6 pb-8">
-            {results.length > 0 ? (
+            {loading ? (
+              <View className="mt-20">
+                <ActivityIndicator size="large" color="#2563eb" />
+              </View>
+            ) : results.length > 0 ? (
               results.map((car) => <ReviewCard key={car.id} {...car} />)
-            ) : debouncedQuery.length > 0 ? (
+            ) : query.length > 0 ? (
               <View className="items-center mt-20">
                 <Ionicons
                   name="alert-circle-outline"
@@ -91,7 +106,7 @@ export default function SearchTab() {
                   color="#d1d5db"
                 />
                 <Text className="text-gray-400 mt-4 text-lg font-medium text-center">
-                  No results found for &quot;{debouncedQuery}&quot;
+                  No results found for &quot;{query}&quot;
                 </Text>
               </View>
             ) : (
