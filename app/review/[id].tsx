@@ -1,15 +1,55 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { View, Text, Image, Pressable, ScrollView, Modal } from "react-native";
-import { reviews } from "../../data/reviews";
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  ScrollView,
+  Modal,
+  ActivityIndicator,
+} from "react-native";
+import { supabase, mapReviewData } from "@/utils/supabase";
+import { Review } from "../../data/reviews";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ReviewDetail() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
+  const [car, setCar] = useState<Review | null>(null);
+  const [loading, setLoading] = useState(true);
   const [fullScreenModalVisible, setFullScreenModalVisible] = useState(false);
-  const car = reviews.find((r) => r.id === Number(id));
+
+  useEffect(() => {
+    async function fetchCar() {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (data) {
+          setCar(mapReviewData(data));
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCar();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <View className="flex-1 justify-center items-center bg-white">
+        <ActivityIndicator size="large" color="#2563eb" />
+      </View>
+    );
+  }
 
   if (!car)
     return (
@@ -37,17 +77,14 @@ export default function ReviewDetail() {
   return (
     <View className="flex-1 bg-white">
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Hero Image Section */}
         <View className="relative shadow-lg">
           <Pressable onPress={() => setFullScreenModalVisible(true)}>
             <Image source={{ uri: car.image }} className="w-full h-[400px]" />
-            {/* Tap Indicator */}
             <View className="absolute bottom-3 right-6 bg-black/40 backdrop-blur-md p-3 rounded-full">
               <Ionicons name="expand-outline" size={18} color="white" />
             </View>
           </Pressable>
 
-          {/* Back Button */}
           <SafeAreaView className="absolute top-0 left-4">
             <Pressable
               onPress={() => router.back()}
@@ -58,9 +95,7 @@ export default function ReviewDetail() {
           </SafeAreaView>
         </View>
 
-        {/* Content Section */}
         <View className="px-6 pt-8 pb-8 bg-white rounded-t-[32px] shadow-sm">
-          {/* Title Section */}
           <View className="mb-6">
             <View className="flex-row items-start justify-between mb-2">
               <View className="flex-1">
@@ -68,7 +103,6 @@ export default function ReviewDetail() {
                   {car.title}
                 </Text>
               </View>
-              {/* Rating Badge */}
               {car.rating && (
                 <View className="bg-amber-100 px-3 py-1.5 rounded-xl flex-row items-center ml-2">
                   <Ionicons name="star" size={14} color="#fbbf24" />
@@ -83,10 +117,8 @@ export default function ReviewDetail() {
             </Text>
           </View>
 
-          {/* Divider */}
           <View className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-8" />
 
-          {/* Quick Specs Grid */}
           {(car.fuelUsage || car.votes || car.author) && (
             <View className="flex-row justify-between mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100">
               {car.fuelUsage && (
@@ -142,7 +174,6 @@ export default function ReviewDetail() {
             </View>
           )}
 
-          {/* Overview Section */}
           <View className="mb-8">
             <View className="flex-row items-center mb-3">
               <View className="w-1 h-6 bg-blue-600 rounded-full mr-3" />
@@ -153,7 +184,6 @@ export default function ReviewDetail() {
             </Text>
           </View>
 
-          {/* Common Issues Section */}
           {car.issues && car.issues.length > 0 && (
             <View className="mb-8">
               <View className="flex-row items-center mb-3">
@@ -179,7 +209,6 @@ export default function ReviewDetail() {
             </View>
           )}
 
-          {/* Owner Notes Card */}
           <View className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100 shadow-sm">
             <View className="flex-row items-center mb-4">
               <View className="bg-blue-600 p-2.5 rounded-lg mr-3">
@@ -196,7 +225,6 @@ export default function ReviewDetail() {
         </View>
       </ScrollView>
 
-      {/* Full Screen Image Modal */}
       <Modal
         visible={fullScreenModalVisible}
         transparent
@@ -204,7 +232,6 @@ export default function ReviewDetail() {
         statusBarTranslucent
       >
         <View className="flex-1 bg-black">
-          {/* Full Screen Image */}
           <Pressable
             onPress={() => setFullScreenModalVisible(false)}
             className="flex-1 justify-center items-center"
@@ -216,7 +243,6 @@ export default function ReviewDetail() {
             />
           </Pressable>
 
-          {/* Car Info at Bottom */}
           <View className="bg-gradient-to-t from-black via-black/70 to-transparent px-6 py-6">
             <Text className="text-white text-2xl font-black">{car.title}</Text>
             <Text className="text-blue-400 font-semibold text-sm tracking-widest uppercase mt-1">
