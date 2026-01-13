@@ -16,3 +16,20 @@ export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
     detectSessionInUrl: false,
   },
 });
+
+export const mapReviewData = (row: any) => ({
+  id: row.id,
+  carMake: row.car_make,
+  carModel: row.car_model,
+  year: row.year,
+  title: row.title,
+  subtitle: row.subtitle,
+  image: row.image,
+  description: row.description,
+  ownerNotes: row.owner_notes,
+  issues: row.issues || [],
+  fuelUsage: row.fuel_usage,
+  rating: Number(row.rating),
+  votes: row.votes,
+  author: row.author,
+});
