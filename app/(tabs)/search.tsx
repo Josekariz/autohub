@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -20,26 +20,52 @@ export default function SearchTab() {
   const [results, setResults] = useState<Review[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Cache to avoid duplicate calls
+  const searchCacheRef = useRef<Record<string, Review[]>>({});
+  // Track ongoing request to cancel if needed
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   useEffect(() => {
     async function handleSearch() {
-      if (query.trim().length === 0) {
+      // Optimization 1: Skip searching if query is too short
+      if (query.trim().length < 2) {
         setResults([]);
         return;
       }
 
+      const trimmedQuery = query.trim().toLowerCase();
+
+      // Optimization 2: Check cache first
+      if (searchCacheRef.current[trimmedQuery]) {
+        setResults(searchCacheRef.current[trimmedQuery]);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
+
       try {
+        // Cancel previous request if new search starts
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+        abortControllerRef.current = new AbortController();
+
         const { data, error } = await supabase
           .from("reviews")
           .select("*")
           .or(
-            `car_make.ilike.%${query}%,car_model.ilike.%${query}%,title.ilike.%${query}%`
-          );
+            `car_make.ilike.%${trimmedQuery}%,car_model.ilike.%${trimmedQuery}%,title.ilike.%${trimmedQuery}%`
+          )
+          .limit(50); // Optimization 3: Limit results
 
         if (error) throw error;
 
         if (data) {
-          setResults(data.map(mapReviewData));
+          const mapped = data.map(mapReviewData);
+          // Optimization 4: Cache the results
+          searchCacheRef.current[trimmedQuery] = mapped;
+          setResults(mapped);
         }
       } catch (err) {
         console.error("Search Error:", err);
@@ -48,7 +74,7 @@ export default function SearchTab() {
       }
     }
 
-    // Debounce: Wait 400ms after user stops typing to call Supabase
+    // Debounce: Wait 400ms after user stops typing
     const timer = setTimeout(handleSearch, 400);
     return () => clearTimeout(timer);
   }, [query]);
