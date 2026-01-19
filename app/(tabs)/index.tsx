@@ -1,4 +1,4 @@
-import "../../global.css";
+
 import HomeScreen from "@/screens/HomeScreen";
 
 
