@@ -1,11 +1,18 @@
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { supabase } from "@/utils/supabase";
 
 export default function ProfileTab() {
   const user = {
     name: "John Doe",
     email: "john@example.com",
+  };
+
+  //signout function
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
   };
 
   return (
@@ -41,7 +48,10 @@ export default function ProfileTab() {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="bg-red-500 p-4 rounded-lg flex-row items-center justify-center mt-4">
+          <TouchableOpacity
+            className="bg-red-500 p-4 rounded-lg flex-row items-center justify-center mt-4"
+            onPress={handleSignOut}
+          >
             <Ionicons name="log-out" size={20} color="white" />
             <Text className="text-white font-semibold ml-3">Sign Out</Text>
           </TouchableOpacity>
