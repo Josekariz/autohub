@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* This ensures that any View with 'bg-main' automatically switches */
+  .bg-main {
+    @apply bg-gray-50 dark:bg-gray-900;
+  }
+
+  .bg-card {
+    @apply bg-white dark:bg-gray-800;
+  }
+
+  .text-primary {
+    @apply text-gray-900 dark:text-white;
+  }
+
+  .text-secondary {
+    @apply text-gray-600 dark:text-gray-400;
+  }
+
+  .border-subtle {
+    @apply border-gray-200 dark:border-gray-700;
+  }
+}
