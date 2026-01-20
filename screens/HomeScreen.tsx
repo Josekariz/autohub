@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; 
+import React, { useEffect, useState } from "react";
 import ReviewCard from "@/components/ReviewCard";
 import {
   ScrollView,
@@ -8,15 +8,14 @@ import {
   RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { supabase, mapReviewData } from "@/utils/supabase"; 
-import { Review } from "../data/reviews"; 
+import { supabase, mapReviewData } from "@/utils/supabase";
+import { Review } from "../data/reviews";
 
 export default function HomeScreen() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Function to fetch data
   const fetchReviews = async () => {
     try {
       const { data, error } = await supabase
@@ -39,9 +38,10 @@ export default function HomeScreen() {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      <View className="px-6 py-4 bg-white border-b border-gray-100">
-        <Text className="text-3xl font-black text-gray-900 tracking-tighter">
+    <SafeAreaView className="flex-1 bg-main">
+      {/* Header */}
+      <View className="px-6 py-4 bg-card border-b border-subtle">
+        <Text className="text-3xl font-black text-primary tracking-tighter">
           Autohub
         </Text>
       </View>
@@ -52,6 +52,7 @@ export default function HomeScreen() {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
+            tintColor="#3b82f6"
             onRefresh={() => {
               setRefreshing(true);
               fetchReviews();
@@ -59,7 +60,7 @@ export default function HomeScreen() {
           />
         }
       >
-        <Text className="text-xs font-bold text-gray-400 uppercase mb-4 tracking-widest">
+        <Text className="text-xs font-bold text-secondary uppercase mb-4 tracking-widest">
           Latest Reviews
         </Text>
 

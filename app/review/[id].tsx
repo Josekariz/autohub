@@ -45,15 +45,15 @@ export default function ReviewDetail() {
 
   if (loading) {
     return (
-      <View className="flex-1 justify-center items-center bg-white">
-        <ActivityIndicator size="large" color="#2563eb" />
+      <View className="flex-1 justify-center items-center bg-main">
+        <ActivityIndicator size="large" color="#2d7cd0" />
       </View>
     );
   }
 
   if (!car)
     return (
-      <View className="flex-1 justify-center items-center bg-white">
+      <View className="flex-1 justify-center items-center bg-main">
         <View className="items-center">
           <Ionicons
             name="alert-circle-outline"
@@ -61,12 +61,10 @@ export default function ReviewDetail() {
             color="#ef4444"
             style={{ marginBottom: 12 }}
           />
-          <Text className="text-xl font-bold text-gray-900">
-            Car not found!
-          </Text>
+          <Text className="text-xl font-bold text-primary">Car not found!</Text>
           <Pressable
             onPress={() => router.back()}
-            className="mt-6 bg-blue-600 px-6 py-3 rounded-xl"
+            className="mt-6 bg-accent px-6 py-3 rounded-xl"
           >
             <Text className="text-white font-semibold">Go Back</Text>
           </Pressable>
@@ -75,7 +73,7 @@ export default function ReviewDetail() {
     );
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-main">
       <ScrollView showsVerticalScrollIndicator={false}>
         <View className="relative shadow-lg">
           <Pressable onPress={() => setFullScreenModalVisible(true)}>
@@ -95,76 +93,77 @@ export default function ReviewDetail() {
           </SafeAreaView>
         </View>
 
-        <View className="px-6 pt-8 pb-8 bg-white rounded-t-[32px] shadow-sm">
+        <View className="px-6 pt-8 pb-8 bg-card rounded-t-[32px] shadow-sm -mt-8">
           <View className="mb-6">
             <View className="flex-row items-start justify-between mb-2">
               <View className="flex-1">
-                <Text className="text-4xl font-black text-gray-900 tracking-tight">
+                <Text className="text-4xl font-black text-primary tracking-tight">
                   {car.title}
                 </Text>
               </View>
               {car.rating && (
-                <View className="bg-amber-100 px-3 py-1.5 rounded-xl flex-row items-center ml-2">
+                <View className="bg-amber-100 dark:bg-amber-900/20 px-3 py-1.5 rounded-xl flex-row items-center ml-2">
                   <Ionicons name="star" size={14} color="#fbbf24" />
-                  <Text className="ml-1 font-bold text-amber-700 text-sm">
+                  <Text className="ml-1 font-bold text-amber-700 dark:text-amber-500 text-sm">
                     {car.rating}
                   </Text>
                 </View>
               )}
             </View>
-            <Text className="text-blue-600 font-semibold tracking-widest uppercase text-xs">
+            <Text className="text-accent font-semibold tracking-widest uppercase text-xs">
               {car.subtitle}
             </Text>
           </View>
 
-          <View className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent mb-8" />
+          <View className="h-px bg-subtle mb-8" />
 
+          {/* Info Badges Row */}
           {(car.fuelUsage || car.votes || car.author) && (
-            <View className="flex-row justify-between mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+            <View className="flex-row justify-between mb-8 bg-main p-4 rounded-2xl border border-subtle">
               {car.fuelUsage && (
                 <View className="items-center flex-1">
                   <Ionicons
                     name="speedometer-outline"
                     size={18}
-                    color="#6b7280"
+                    color="#9ca3af"
                   />
-                  <Text className="text-[10px] text-gray-400 uppercase mt-1">
+                  <Text className="text-[10px] text-secondary uppercase mt-1">
                     Fuel
                   </Text>
-                  <Text className="text-sm font-bold text-gray-900">
+                  <Text className="text-sm font-bold text-primary">
                     {car.fuelUsage}
                   </Text>
                 </View>
               )}
               {car.fuelUsage && car.votes && (
-                <View className="w-px h-8 bg-gray-200 self-center" />
+                <View className="w-px h-8 bg-subtle self-center" />
               )}
               {car.votes && (
                 <View className="items-center flex-1">
-                  <Ionicons name="people-outline" size={18} color="#6b7280" />
-                  <Text className="text-[10px] text-gray-400 uppercase mt-1">
+                  <Ionicons name="people-outline" size={18} color="#9ca3af" />
+                  <Text className="text-[10px] text-secondary uppercase mt-1">
                     Votes
                   </Text>
-                  <Text className="text-sm font-bold text-gray-900">
+                  <Text className="text-sm font-bold text-primary">
                     {car.votes}
                   </Text>
                 </View>
               )}
               {car.votes && car.author && (
-                <View className="w-px h-8 bg-gray-200 self-center" />
+                <View className="w-px h-8 bg-subtle self-center" />
               )}
               {car.author && (
                 <View className="items-center flex-1">
                   <Ionicons
                     name="person-circle-outline"
                     size={18}
-                    color="#6b7280"
+                    color="#9ca3af"
                   />
-                  <Text className="text-[10px] text-gray-400 uppercase mt-1">
+                  <Text className="text-[10px] text-secondary uppercase mt-1">
                     Author
                   </Text>
                   <Text
-                    className="text-sm font-bold text-gray-900"
+                    className="text-sm font-bold text-primary"
                     numberOfLines={1}
                   >
                     {car.author}
@@ -174,21 +173,23 @@ export default function ReviewDetail() {
             </View>
           )}
 
+          {/* Overview Section */}
           <View className="mb-8">
             <View className="flex-row items-center mb-3">
-              <View className="w-1 h-6 bg-blue-600 rounded-full mr-3" />
-              <Text className="text-lg font-bold text-gray-900">Overview</Text>
+              <View className="w-1 h-6 bg-accent rounded-full mr-3" />
+              <Text className="text-lg font-bold text-primary">Overview</Text>
             </View>
-            <Text className="text-gray-600 leading-7 text-base pl-4">
+            <Text className="text-secondary leading-7 text-base pl-4">
               {car.description}
             </Text>
           </View>
 
+          {/* Common Issues Section */}
           {car.issues && car.issues.length > 0 && (
             <View className="mb-8">
               <View className="flex-row items-center mb-3">
                 <View className="w-1 h-6 bg-red-500 rounded-full mr-3" />
-                <Text className="text-lg font-bold text-gray-900">
+                <Text className="text-lg font-bold text-primary">
                   Common Issues
                 </Text>
               </View>
@@ -200,7 +201,7 @@ export default function ReviewDetail() {
                       size={14}
                       color="#ef4444"
                     />
-                    <Text className="text-gray-600 ml-2 text-base">
+                    <Text className="text-secondary ml-2 text-base">
                       {issue}
                     </Text>
                   </View>
@@ -209,22 +210,27 @@ export default function ReviewDetail() {
             </View>
           )}
 
-          <View className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-100 shadow-sm">
+          {/* Owner's Take Box */}
+          <View className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-2xl border border-blue-100 dark:border-blue-800/30 shadow-sm">
             <View className="flex-row items-center mb-4">
-              <View className="bg-blue-600 p-2.5 rounded-lg mr-3">
+              {/* Icon Container */}
+              <View className="bg-accent p-2.5 rounded-lg mr-3">
                 <Ionicons name="chatbubble-ellipses" size={18} color="white" />
               </View>
-              <Text className="font-bold text-gray-900 text-lg">
+
+              <Text className="font-bold text-primary text-lg">
                 Owner&apos;s Take
               </Text>
             </View>
-            <Text className="text-gray-700 italic leading-6 text-base pl-1">
+
+            <Text className="text-primary dark:text-gray-200 italic leading-6 text-base pl-1">
               &quot;{car.ownerNotes}&quot;
             </Text>
           </View>
         </View>
       </ScrollView>
 
+      {/* Full Screen Image Modal */}
       <Modal
         visible={fullScreenModalVisible}
         transparent
@@ -242,10 +248,9 @@ export default function ReviewDetail() {
               resizeMode="contain"
             />
           </Pressable>
-
-          <View className="bg-gradient-to-t from-black via-black/70 to-transparent px-6 py-6">
+          <View className="bg-black/80 px-6 py-10">
             <Text className="text-white text-2xl font-black">{car.title}</Text>
-            <Text className="text-blue-400 font-semibold text-sm tracking-widest uppercase mt-1">
+            <Text className="text-accent font-semibold text-sm tracking-widest uppercase mt-1">
               {car.subtitle}
             </Text>
           </View>

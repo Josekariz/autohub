@@ -39,10 +39,7 @@ export default function AddReviewForm({
   });
 
   const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const pickImage = async () => {
@@ -54,16 +51,12 @@ export default function AddReviewForm({
     });
 
     if (!result.canceled) {
-      setFormData((prev) => ({
-        ...prev,
-        image: result.assets[0].uri,
-      }));
+      setFormData((prev) => ({ ...prev, image: result.assets[0].uri }));
     }
   };
 
   const takePhoto = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
-
     if (!permission.granted) {
       Alert.alert(
         "Permission required",
@@ -79,19 +72,11 @@ export default function AddReviewForm({
     });
 
     if (!result.canceled) {
-      setFormData((prev) => ({
-        ...prev,
-        image: result.assets[0].uri,
-      }));
+      setFormData((prev) => ({ ...prev, image: result.assets[0].uri }));
     }
   };
 
-  const removeImage = () => {
-    setFormData((prev) => ({
-      ...prev,
-      image: "",
-    }));
-  };
+  const removeImage = () => setFormData((prev) => ({ ...prev, image: "" }));
 
   const handleSubmit = () => {
     if (
@@ -145,25 +130,28 @@ export default function AddReviewForm({
       onRequestClose={onClose}
       presentationStyle="formSheet"
     >
-      <SafeAreaView className="flex-1 bg-white">
-        <View className="flex-row justify-between items-center px-4 py-4 border-b border-gray-200">
-          <Text className="text-xl font-bold text-gray-900">Add a Review</Text>
+      {/* main Background */}
+      <SafeAreaView className="flex-1 bg-main">
+        {/* Header: */}
+        <View className="flex-row justify-between items-center px-4 py-4 bg-card border-b border-subtle">
+          <Text className="text-xl font-bold text-primary">Add a Review</Text>
           <TouchableOpacity onPress={onClose}>
-            <Ionicons name="close" size={24} color="#000" />
+            <Ionicons name="close" size={24} color="#9ca3af" />
           </TouchableOpacity>
         </View>
 
         <ScrollView className="flex-1 px-4 py-4">
+
           {/* Image Selector */}
           <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
+            <Text className="text-sm font-semibold text-secondary mb-2">
               Car Photo
             </Text>
             {formData.image ? (
               <View className="relative mb-3">
                 <Image
                   source={{ uri: formData.image }}
-                  className="w-full h-48 rounded-lg bg-gray-200"
+                  className="w-full h-48 rounded-lg bg-card"
                 />
                 <TouchableOpacity
                   onPress={removeImage}
@@ -173,9 +161,9 @@ export default function AddReviewForm({
                 </TouchableOpacity>
               </View>
             ) : (
-              <View className="bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 p-4 mb-3 items-center justify-center h-48">
-                <Ionicons name="image" size={48} color="#d1d5db" />
-                <Text className="text-gray-600 text-sm mt-2">
+              <View className="bg-card rounded-lg border-2 border-dashed border-subtle p-4 mb-3 items-center justify-center h-48">
+                <Ionicons name="image" size={48} color="#9ca3af" />
+                <Text className="text-secondary text-sm mt-2">
                   No image selected
                 </Text>
               </View>
@@ -183,7 +171,7 @@ export default function AddReviewForm({
             <View className="flex-row gap-2">
               <TouchableOpacity
                 onPress={takePhoto}
-                className="flex-1 bg-blue-500 rounded-lg py-2 flex-row items-center justify-center gap-2"
+                className="flex-1 bg-accent rounded-lg py-2 flex-row items-center justify-center gap-2"
               >
                 <Ionicons name="camera" size={18} color="white" />
                 <Text className="text-white font-semibold">Take Photo</Text>
@@ -198,80 +186,59 @@ export default function AddReviewForm({
             </View>
           </View>
 
-          {/* Car Make */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
-              Car Make *
-            </Text>
-            <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
-              placeholder="e.g., Toyota"
-              value={formData.carMake}
-              onChangeText={(value) => handleChange("carMake", value)}
-            />
-          </View>
+          {/* Reusable Input Fields Logic */}
+          {[
+            {
+              label: "Car Make *",
+              field: "carMake",
+              placeholder: "e.g., Toyota",
+            },
+            {
+              label: "Car Model *",
+              field: "carModel",
+              placeholder: "e.g., Camry",
+            },
+            {
+              label: "Year *",
+              field: "year",
+              placeholder: "e.g., 2023",
+              keyboard: "number-pad",
+            },
+            {
+              label: "Review Title *",
+              field: "title",
+              placeholder: "e.g., Reliable and Efficient",
+            },
+            {
+              label: "Subtitle",
+              field: "subtitle",
+              placeholder: "Brief tagline",
+            },
+          ].map((item) => (
+            <View key={item.field} className="mb-4">
+              <Text className="text-sm font-semibold text-secondary mb-2">
+                {item.label}
+              </Text>
+              <TextInput
+                className="bg-card border border-subtle rounded-lg px-3 py-2 text-primary"
+                placeholder={item.placeholder}
+                placeholderTextColor="#9ca3af"
+                value={(formData as any)[item.field]}
+                onChangeText={(value) => handleChange(item.field, value)}
+                keyboardType={(item.keyboard as any) || "default"}
+              />
+            </View>
+          ))}
 
-          {/* Car Model */}
+          {/* Large Text Areas */}
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
-              Car Model *
-            </Text>
-            <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
-              placeholder="e.g., Camry"
-              value={formData.carModel}
-              onChangeText={(value) => handleChange("carModel", value)}
-            />
-          </View>
-
-          {/* Year */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
-              Year *
-            </Text>
-            <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
-              placeholder="e.g., 2023"
-              value={formData.year}
-              onChangeText={(value) => handleChange("year", value)}
-              keyboardType="number-pad"
-            />
-          </View>
-
-          {/* Title */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
-              Review Title *
-            </Text>
-            <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
-              placeholder="e.g., Reliable and Efficient"
-              value={formData.title}
-              onChangeText={(value) => handleChange("title", value)}
-            />
-          </View>
-
-          {/* Subtitle */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
-              Subtitle
-            </Text>
-            <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
-              placeholder="Brief tagline"
-              value={formData.subtitle}
-              onChangeText={(value) => handleChange("subtitle", value)}
-            />
-          </View>
-
-          {/* Description */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
+            <Text className="text-sm font-semibold text-secondary mb-2">
               Description *
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900 h-24"
+              className="bg-card border border-subtle rounded-lg px-3 py-2 text-primary h-24"
               placeholder="Detailed review of the car"
+              placeholderTextColor="#9ca3af"
               value={formData.description}
               onChangeText={(value) => handleChange("description", value)}
               multiline
@@ -281,12 +248,13 @@ export default function AddReviewForm({
 
           {/* Owner Notes */}
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
+            <Text className="text-sm font-semibold text-secondary mb-2">
               Owner Notes
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900 h-20"
+              className="bg-card border border-subtle rounded-lg px-3 py-2 text-primary h-20"
               placeholder="Additional notes about ownership"
+              placeholderTextColor="#9ca3af"
               value={formData.ownerNotes}
               onChangeText={(value) => handleChange("ownerNotes", value)}
               multiline
@@ -296,12 +264,13 @@ export default function AddReviewForm({
 
           {/* Issues */}
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
+            <Text className="text-sm font-semibold text-secondary mb-2">
               Issues (comma-separated)
             </Text>
             <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900 h-20"
-              placeholder="e.g., Engine knock, Interior rattle, Door creak"
+              className="bg-card border border-subtle rounded-lg px-3 py-2 text-primary h-20"
+              placeholder="e.g., Engine knock, Interior rattle"
+              placeholderTextColor="#9ca3af"
               value={formData.issues}
               onChangeText={(value) => handleChange("issues", value)}
               multiline
@@ -309,39 +278,41 @@ export default function AddReviewForm({
             />
           </View>
 
-          {/* Fuel Usage */}
-          <View className="mb-4">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
-              Fuel Usage
-            </Text>
-            <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
-              placeholder="e.g., 25 MPG combined"
-              value={formData.fuelUsage}
-              onChangeText={(value) => handleChange("fuelUsage", value)}
-            />
-          </View>
-
-          {/* Rating */}
-          <View className="mb-6">
-            <Text className="text-sm font-semibold text-gray-700 mb-2">
-              Rating (1-5) *
-            </Text>
-            <TextInput
-              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
-              placeholder="5"
-              value={formData.rating}
-              onChangeText={(value) => handleChange("rating", value)}
-              keyboardType="number-pad"
-            />
+          {/* Rating & Fuel */}
+          <View className="mb-4 flex-row gap-4">
+            <View className="flex-1">
+              <Text className="text-sm font-semibold text-secondary mb-2">
+                Fuel Usage
+              </Text>
+              <TextInput
+                className="bg-card border border-subtle rounded-lg px-3 py-2 text-primary"
+                placeholder="25 MPG"
+                placeholderTextColor="#9ca3af"
+                value={formData.fuelUsage}
+                onChangeText={(value) => handleChange("fuelUsage", value)}
+              />
+            </View>
+            <View className="flex-1">
+              <Text className="text-sm font-semibold text-secondary mb-2">
+                Rating (1-5) *
+              </Text>
+              <TextInput
+                className="bg-card border border-subtle rounded-lg px-3 py-2 text-primary"
+                placeholder="5"
+                placeholderTextColor="#9ca3af"
+                value={formData.rating}
+                onChangeText={(value) => handleChange("rating", value)}
+                keyboardType="number-pad"
+              />
+            </View>
           </View>
 
           {/* Submit Button */}
           <TouchableOpacity
-            className="bg-blue-500 rounded-lg py-3 mb-4"
+            className="bg-accent rounded-xl py-4 mb-10 shadow-lg active:opacity-90"
             onPress={handleSubmit}
           >
-            <Text className="text-white font-semibold text-center text-base">
+            <Text className="text-white font-bold text-center text-lg">
               Submit Review
             </Text>
           </TouchableOpacity>

@@ -17,12 +17,10 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const [error, setError] = useState<string | null>(null); 
+  const [error, setError] = useState<string | null>(null);
 
   async function handleAuth() {
-    
     setError(null);
-
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
@@ -35,22 +33,15 @@ export default function LoginScreen() {
           email,
           password,
         });
-
-        if (signUpError) {
-          setError(signUpError.message);
-        } else if (!data.session) {
-          // only shows if'Confirm Email' ON
+        if (signUpError) setError(signUpError.message);
+        else if (!data.session)
           setError("Check your inbox to verify your email.");
-        }
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-
-        if (signInError) {
-          setError(signInError.message);
-        }
+        if (signInError) setError(signInError.message);
       }
     } catch (e) {
       setError("An unexpected error occurred. Please try again.");
@@ -60,25 +51,25 @@ export default function LoginScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-main">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1 px-12 justify-center"
       >
         <View className="mb-10">
-          <Text className="text-5xl font-black text-gray-900 tracking-tighter">
+          <Text className="text-5xl font-black text-primary tracking-tighter">
             Autohub
           </Text>
-          <Text className="text-gray-500 text-lg mt-2 font-medium leading-6">
+
+          <Text className="text-secondary text-lg mt-2 font-medium leading-6">
             {isSignUp ? "Create your account" : "Welcome back"}
           </Text>
         </View>
 
-        
         {error && (
-          <View className="bg-red-50 p-4 rounded-xl border border-red-100 mb-6 flex-row items-center">
+          <View className="bg-red-50 dark:bg-red-900/20 p-4 rounded-xl border border-red-100 dark:border-red-900/30 mb-6 flex-row items-center">
             <Ionicons name="alert-circle" size={20} color="#ef4444" />
-            <Text className="text-red-600 ml-3 font-semibold flex-1">
+            <Text className="text-red-600 dark:text-red-400 ml-3 font-semibold flex-1">
               {error}
             </Text>
           </View>
@@ -87,6 +78,7 @@ export default function LoginScreen() {
         <View className="gap-y-4">
           <TextInput
             placeholder="Email"
+            placeholderTextColor="#9ca3af"
             value={email}
             onChangeText={(text) => {
               setEmail(text);
@@ -95,10 +87,11 @@ export default function LoginScreen() {
             autoCapitalize="none"
             keyboardType="email-address"
             editable={!loading}
-            className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-lg"
+            className="bg-card p-4 rounded-xl border border-subtle text-primary text-lg"
           />
           <TextInput
             placeholder="Password"
+            placeholderTextColor="#9ca3af"
             value={password}
             onChangeText={(text) => {
               setPassword(text);
@@ -107,7 +100,7 @@ export default function LoginScreen() {
             secureTextEntry
             autoCapitalize="none"
             editable={!loading}
-            className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-lg"
+            className="bg-card p-4 rounded-xl border border-subtle text-primary text-lg"
           />
         </View>
 
@@ -115,7 +108,7 @@ export default function LoginScreen() {
           <Pressable
             onPress={handleAuth}
             disabled={loading}
-            className="bg-blue-600 p-4 rounded-xl items-center active:bg-blue-700 shadow-sm"
+            className="bg-accent p-4 rounded-xl items-center active:opacity-80 shadow-sm"
           >
             {loading ? (
               <ActivityIndicator color="white" />
@@ -129,40 +122,20 @@ export default function LoginScreen() {
           <Pressable
             onPress={() => {
               setIsSignUp(!isSignUp);
-              setError(null); 
+              setError(null);
             }}
             className="items-center mt-2"
           >
-            <Text className="text-gray-500">
+            <Text className="text-secondary">
               {isSignUp
                 ? "Already have an account? "
                 : "Don't have an account? "}
-              <Text className="text-blue-600 font-bold">
+              <Text className="text-accent font-bold">
                 {isSignUp ? "Sign In" : "Sign Up"}
               </Text>
             </Text>
           </Pressable>
         </View>
-        {/* Impliment login with google */}
-        {/* <View className="mt-12">
-          <View className="flex-row items-center mb-6">
-            <View className="flex-1 h-px bg-gray-200" />
-            <Text className="mx-4 text-gray-400 font-bold uppercase text-[10px] tracking-widest">
-              Or
-            </Text>
-            <View className="flex-1 h-px bg-gray-200" />
-          </View>
-
-          <Pressable
-            disabled={loading}
-            className="flex-row items-center border border-gray-200 p-4 rounded-xl w-full justify-center active:bg-gray-50"
-          >
-            <Ionicons name="logo-google" size={20} color="#EA4335" />
-            <Text className="ml-3 font-bold text-gray-700">
-              Continue with Google
-            </Text>
-          </Pressable>
-        </View> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
