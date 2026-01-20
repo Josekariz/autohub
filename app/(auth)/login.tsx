@@ -143,8 +143,8 @@ export default function LoginScreen() {
             </Text>
           </Pressable>
         </View>
-
-        <View className="mt-12">
+        {/* Impliment login with google */}
+        {/* <View className="mt-12">
           <View className="flex-row items-center mb-6">
             <View className="flex-1 h-px bg-gray-200" />
             <Text className="mx-4 text-gray-400 font-bold uppercase text-[10px] tracking-widest">
@@ -162,7 +162,7 @@ export default function LoginScreen() {
               Continue with Google
             </Text>
           </Pressable>
-        </View>
+        </View> */}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
