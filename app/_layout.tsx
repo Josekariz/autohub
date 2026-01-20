@@ -3,6 +3,8 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { supabase } from "@/utils/supabase";
 import { Session } from "@supabase/supabase-js";
 import { View, ActivityIndicator } from "react-native";
+import { useColorScheme } from "nativewind";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import "../global.css";
 
 export default function RootLayout() {
@@ -11,14 +13,33 @@ export default function RootLayout() {
   const segments = useSegments();
   const router = useRouter();
 
-  useEffect(() => {
-    // 1. Check initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setInitialized(true);
-    });
+  // Get the color switcher
+  const { setColorScheme } = useColorScheme();
 
-    //2. Listen for Auth changes
+  useEffect(() => {
+    async function initializeApp() {
+      try {
+        // Load Theme first
+        const savedTheme = await AsyncStorage.getItem("app-theme");
+        if (savedTheme) {
+          setColorScheme(savedTheme as any);
+        }
+
+        // Check Auth Session
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        setSession(session);
+      } catch (e) {
+        console.error("Initialization error", e);
+      } finally {
+        setInitialized(true);
+      }
+    }
+
+    initializeApp();
+
+    // listening for Auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
@@ -30,21 +51,20 @@ export default function RootLayout() {
     };
   }, []);
 
+  // Handles redirects
   useEffect(() => {
     if (!initialized) return;
 
     const inAuthGroup = segments[0] === "(auth)";
 
     if (!session && !inAuthGroup) {
-      // Redirect to login if not authenticated
       router.replace("/(auth)/login" as any);
     } else if (session && inAuthGroup) {
-      // Redirect to tabs if authenticated
       router.replace("/(tabs)" as any);
     }
   }, [session, initialized, segments]);
 
-  // If not initialized, show a loading spinner
+  // Loading state (Shown while checking memory and Supabase)
   if (!initialized) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -54,9 +74,12 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)/login" />
-      <Stack.Screen name="(tabs)" />
-    </Stack>
+    /* 8. The Root View */
+    <View className="flex-1 bg-white dark:bg-gray-900">
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)/login" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+    </View>
   );
 }
