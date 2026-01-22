@@ -20,6 +20,7 @@ export default function ReviewDetail() {
   const [car, setCar] = useState<Review | null>(null);
   const [loading, setLoading] = useState(true);
   const [fullScreenModalVisible, setFullScreenModalVisible] = useState(false);
+  const [canDelete, setCanDelete] = useState(false); // Toggle for delete button visibility
 
   useEffect(() => {
     async function fetchCar() {
@@ -42,6 +43,11 @@ export default function ReviewDetail() {
     }
     fetchCar();
   }, [id]);
+
+  const handleDelete = () => {
+    // Delete logic will go here
+    console.log("Delete review:", id);
+  };
 
   if (loading) {
     return (
@@ -75,25 +81,41 @@ export default function ReviewDetail() {
   return (
     <View className="flex-1 bg-main">
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="relative shadow-lg">
+        <View>
           <Pressable onPress={() => setFullScreenModalVisible(true)}>
             <Image source={{ uri: car.image }} className="w-full h-[400px]" />
-            <View className="absolute bottom-3 right-6 bg-black/40 backdrop-blur-md p-3 rounded-full">
-              <Ionicons name="expand-outline" size={18} color="white" />
-            </View>
           </Pressable>
 
-          <SafeAreaView className="absolute top-0 left-4">
+          {/* Back Button with Delete Button */}
+          <SafeAreaView className="absolute top-0 left-0 right-0 flex-row justify-between items-center px-4">
             <Pressable
               onPress={() => router.back()}
               className="bg-black/30 backdrop-blur-md p-3 rounded-full border border-white/40 active:bg-black/50"
             >
               <Ionicons name="chevron-back" size={20} color="white" />
             </Pressable>
+
+            {/* Delete Button - Hidden by canDelete boolean */}
+            {canDelete && (
+              <Pressable
+                onPress={handleDelete}
+                className="bg-red-500/80 backdrop-blur-md p-3 rounded-full active:bg-red-600"
+              >
+                <Ionicons name="trash-outline" size={20} color="white" />
+              </Pressable>
+            )}
           </SafeAreaView>
+
+          {/* Expand Icon Button */}
+          <Pressable
+            onPress={() => setFullScreenModalVisible(true)}
+            className="absolute bottom-3 right-6 bg-black/40 backdrop-blur-md p-3 rounded-full"
+          >
+            <Ionicons name="expand-outline" size={18} color="white" />
+          </Pressable>
         </View>
 
-        <View className="px-6 pt-8 pb-8 bg-card rounded-t-[32px] shadow-sm -mt-8">
+        <View className="px-6 pt-8 pb-8 bg-card shadow-sm">
           <View className="mb-6">
             <View className="flex-row items-start justify-between mb-2">
               <View className="flex-1">
