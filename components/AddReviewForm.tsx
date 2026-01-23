@@ -12,6 +12,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { uploadCarImage } from "@/services/imageService";
+import { createReview } from "@/services/reviewService";
 
 interface AddReviewFormProps {
   visible: boolean;
@@ -24,6 +26,8 @@ export default function AddReviewForm({
   onClose,
   onSubmit,
 }: AddReviewFormProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     carMake: "",
     carModel: "",
@@ -60,7 +64,7 @@ export default function AddReviewForm({
     if (!permission.granted) {
       Alert.alert(
         "Permission required",
-        "Camera permission is needed to take photos"
+        "Camera permission is needed to take photos",
       );
       return;
     }
@@ -78,7 +82,7 @@ export default function AddReviewForm({
 
   const removeImage = () => setFormData((prev) => ({ ...prev, image: "" }));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (
       !formData.carMake ||
       !formData.carModel ||
@@ -88,23 +92,57 @@ export default function AddReviewForm({
     ) {
       Alert.alert(
         "Missing fields",
-        "Please fill in all required fields marked with *"
+        "Please fill in all required fields marked with *",
       );
       return;
     }
 
-    const reviewData = {
-      ...formData,
-      issues: formData.issues
-        .split(",")
-        .map((issue) => issue.trim())
-        .filter((issue) => issue !== ""),
-      rating: parseInt(formData.rating),
-      year: parseInt(formData.year),
-    };
+    setIsSubmitting(true);
+    try {
+      let imageFilename = "";
 
-    onSubmit(reviewData);
-    resetForm();
+      //Upload image
+      if (formData.image) {
+        imageFilename = await uploadCarImage(
+          formData.image,
+          `review-${Date.now()}`,
+        );
+      }
+
+      // Create review
+
+      const reviewData = {
+        carMake: formData.carMake,
+        carModel: formData.carModel,
+        year: parseInt(formData.year),
+        title: formData.title,
+        subtitle: formData.subtitle,
+        description: formData.description,
+        ownerNotes: formData.ownerNotes,
+        issues: formData.issues
+          .split(",")
+          .map((issue) => issue.trim())
+          .filter((issue) => issue !== ""),
+        fuelUsage: formData.fuelUsage,
+        rating: parseInt(formData.rating),
+        image: imageFilename, // Store the filename
+      };
+
+      await createReview(reviewData);
+
+      // Close form and reset
+      Alert.alert("Success", "Your review has been submitted!");
+      resetForm();
+      onSubmit(reviewData);
+    } catch (error: any) {
+      console.error("Full error details:", error);
+      Alert.alert(
+        "Error",
+        error.message || "Failed to submit review. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -141,7 +179,6 @@ export default function AddReviewForm({
         </View>
 
         <ScrollView className="flex-1 px-4 py-4">
-
           {/* Image Selector */}
           <View className="mb-6">
             <Text className="text-sm font-semibold text-secondary mb-2">
@@ -309,11 +346,14 @@ export default function AddReviewForm({
 
           {/* Submit Button */}
           <TouchableOpacity
-            className="bg-accent rounded-xl py-4 mb-10 shadow-lg active:opacity-90"
+            className={`${
+              isSubmitting ? "bg-gray-400" : "bg-accent"
+            } rounded-xl py-4 mb-10 shadow-lg active:opacity-90`}
             onPress={handleSubmit}
+            disabled={isSubmitting}
           >
             <Text className="text-white font-bold text-center text-lg">
-              Submit Review
+              {isSubmitting ? "Submitting..." : "Submit Review"}
             </Text>
           </TouchableOpacity>
         </ScrollView>
